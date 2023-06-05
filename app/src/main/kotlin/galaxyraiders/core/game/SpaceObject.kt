@@ -13,6 +13,8 @@ open class SpaceObject(
   mass: Double
 ) :
   Object2D(initialPosition, initialVelocity, radius, mass) {
+  open var isActive: Boolean = true
+
   override fun toString(): String {
     return "${this.type} at ${this.center}"
   }

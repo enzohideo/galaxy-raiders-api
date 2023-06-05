@@ -79,4 +79,15 @@ class SpaceObjectTest {
 
     assertFalse(so.inBoundaries(boundaryX, boundaryY))
   }
+
+  @Test
+  fun `it can verify if it is active `() {
+    assertTrue(so.isActive)
+  }
+
+  @Test
+  fun `it can be deactivated `() {
+    so.isActive = false
+    assertFalse(so.isActive)
+  }
 }

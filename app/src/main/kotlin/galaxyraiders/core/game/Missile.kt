@@ -9,4 +9,9 @@ class Missile(
   radius: Double,
   mass: Double
 ) :
-  SpaceObject("Missile", '^', initialPosition, initialVelocity, radius, mass)
+  SpaceObject("Missile", '^', initialPosition, initialVelocity, radius, mass) {
+  fun hit(asteroid: Asteroid): Explosion {
+    this.isActive = false
+    return asteroid.explode()
+  }
+}

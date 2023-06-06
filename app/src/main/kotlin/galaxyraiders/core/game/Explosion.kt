@@ -5,20 +5,27 @@ import galaxyraiders.core.physics.Vector2D
 
 class Explosion(
   initialPosition: Point2D,
-  initialVelocity: Vector2D,
   radius: Double,
-  mass: Double
 ) :
-  SpaceObject("Explosion", '+', initialPosition, initialVelocity, radius, mass) {
+  SpaceObject("Explosion", '+', initialPosition, Vector2D(0.0, 0.0), radius, 0.0) {
+  private var triggerTime: Long = 0
+  var duration: Long = 0
+    private set
 
-  var trigger: Boolean = false
+  val wasTriggered: Boolean
+    get() = this.triggerTime > 0
 
-  fun setTriggered(bool: Boolean) {
-    this.trigger = bool
-    return Unit
+  fun trigger(duration: Long) {
+    this.triggerTime = System.currentTimeMillis()
+    this.duration = duration
   }
 
-  fun isTriggered(): Boolean {
-    return this.trigger
+  override var isActive: Boolean = true
+    get() = field && !this.hasEnded()
+
+  private fun hasEnded(): Boolean {
+    val now = System.currentTimeMillis()
+    println("explosion: " + (now - this.triggerTime) + " " + this.duration + " trig: " + this.wasTriggered)
+    return this.wasTriggered && (now - this.triggerTime) > this.duration
   }
 }

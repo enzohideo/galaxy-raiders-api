@@ -23,6 +23,8 @@ object SpaceFieldConfig {
   val asteroidMinMass = config.get<Int>("ASTEROID_MIN_MASS")
   val asteroidMaxMass = config.get<Int>("ASTEROID_MAX_MASS")
   val asteroidMassMultiplier = config.get<Double>("ASTEROID_MASS_MULTIPLIER")
+
+  val explosionDuration = config.get<Long>("EXPLOSION_DURATION")
 }
 
 @Suppress("TooManyFunctions")
@@ -38,7 +40,13 @@ data class SpaceField(val width: Int, val height: Int, val generator: RandomGene
   var asteroids: List<Asteroid> = emptyList()
     private set
 
+  var explosions: List<Explosion> = emptyList()
+    private set
+
   val spaceObjects: List<SpaceObject>
+    get() = listOf(this.ship) + this.missiles + this.asteroids + this.explosions
+
+  val collidableSpaceObjects: List<SpaceObject>
     get() = listOf(this.ship) + this.missiles + this.asteroids
 
   fun moveShip() {
@@ -61,6 +69,10 @@ data class SpaceField(val width: Int, val height: Int, val generator: RandomGene
     this.asteroids += this.createAsteroidWithRandomProperties()
   }
 
+  fun generateExplosion(missile: Missile, asteroid: Asteroid) {
+    this.explosions += this.createExplosion(missile, asteroid)
+  }
+
   fun trimMissiles() {
     this.missiles = this.missiles.filter {
       it.isActive && it.inBoundaries(this.boundaryX, this.boundaryY)
@@ -70,6 +82,12 @@ data class SpaceField(val width: Int, val height: Int, val generator: RandomGene
   fun trimAsteroids() {
     this.asteroids = this.asteroids.filter {
       it.isActive && it.inBoundaries(this.boundaryX, this.boundaryY)
+    }
+  }
+
+  fun trimExplosions() {
+    this.explosions = this.explosions.filter {
+      it.isActive
     }
   }
 
@@ -152,5 +170,11 @@ data class SpaceField(val width: Int, val height: Int, val generator: RandomGene
     )
 
     return scaledMass * SpaceFieldConfig.asteroidMassMultiplier
+  }
+
+  private fun createExplosion(missile: Missile, asteroid: Asteroid): Explosion {
+    val explosion = missile.hit(asteroid)
+    explosion.trigger(SpaceFieldConfig.explosionDuration)
+    return explosion
   }
 }

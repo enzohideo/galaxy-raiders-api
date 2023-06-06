@@ -15,6 +15,7 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import java.util.stream.Stream
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNotEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
@@ -81,7 +82,36 @@ class SpaceFieldTest {
   }
 
   @Test
-  fun `it has a list of objects with ship, missiles and asteroids`() {
+  fun `it starts with no explosions`() {
+    assertAll(
+      "SpaceField should initialize an empty list of missiles",
+      { assertNotNull(spaceField.explosions) },
+      { assertEquals(0, spaceField.explosions.size) },
+    )
+  }
+
+  @Test
+  fun `it has a list of objects with ship, missiles, asteroids and explosions`() {
+    val ship = spaceField.ship
+
+    spaceField.generateMissile()
+    val missile = spaceField.missiles.last()
+
+    spaceField.generateAsteroid()
+    val asteroid = spaceField.asteroids.last()
+
+    spaceField.generateExplosion(missile, asteroid)
+    val explosion = spaceField.explosions.last()
+
+    val expectedSpaceObjects = listOf<SpaceObject>(
+      ship, missile, asteroid, explosion
+    )
+
+    assertEquals(expectedSpaceObjects, spaceField.spaceObjects)
+  }
+
+  @Test
+  fun `it has a list of collidable objects with ship, missiles and asteroids`() {
     val ship = spaceField.ship
 
     spaceField.generateMissile()
@@ -94,7 +124,7 @@ class SpaceFieldTest {
       ship, missile, asteroid
     )
 
-    assertEquals(expectedSpaceObjects, spaceField.spaceObjects)
+    assertEquals(expectedSpaceObjects, spaceField.collidableSpaceObjects)
   }
 
   @Test
@@ -334,6 +364,19 @@ class SpaceFieldTest {
   }
 
   @Test
+  fun `it can remove a deactivated missile`() {
+    spaceField.generateMissile()
+
+    val missile = spaceField.missiles.last()
+
+    missile.isActive = false
+
+    spaceField.trimMissiles()
+
+    assertEquals(-1, spaceField.missiles.indexOf(missile))
+  }
+
+  @Test
   fun `it does not remove missiles inside its boundary`() {
     spaceField.generateMissile()
 
@@ -365,6 +408,19 @@ class SpaceFieldTest {
   }
 
   @Test
+  fun `it can remove a deactivated asteroid`() {
+    spaceField.generateAsteroid()
+
+    val asteroid = spaceField.asteroids.last()
+
+    asteroid.isActive = false
+
+    spaceField.trimAsteroids()
+
+    assertEquals(-1, spaceField.asteroids.indexOf(asteroid))
+  }
+
+  @Test
   fun `it does not remove asteroids inside its boundary`() {
     spaceField.generateAsteroid()
 
@@ -385,5 +441,84 @@ class SpaceFieldTest {
         SpaceField(width = 12, height = 8, generator = generator)
       }).toStreamOfArguments()
     }
+  }
+
+  @Test
+  fun `it can generate a new explosion`() {
+    spaceField.generateMissile()
+    val missile = spaceField.missiles.last()
+
+    spaceField.generateAsteroid()
+    val asteroid = spaceField.asteroids.last()
+
+    val numExplosions = spaceField.explosions.size
+    spaceField.generateExplosion(missile, asteroid)
+
+    assertEquals(numExplosions + 1, spaceField.explosions.size)
+  }
+
+  @Test
+  fun `it generates a new explosion at the asteroids position`() {
+    spaceField.generateMissile()
+    val missile = spaceField.missiles.last()
+
+    spaceField.generateAsteroid()
+    val asteroid = spaceField.asteroids.last()
+
+    spaceField.generateExplosion(missile, asteroid)
+    val explosion = spaceField.explosions.last()
+
+    assertEquals(asteroid.center, explosion.center)
+  }
+
+  @Test
+  fun `it generates a new explosion and deactivates the missile and asteroid`() {
+    spaceField.generateMissile()
+    val missile = spaceField.missiles.last()
+
+    spaceField.generateAsteroid()
+    val asteroid = spaceField.asteroids.last()
+
+    spaceField.generateExplosion(missile, asteroid)
+
+    assertAll(
+      "It should deactivate the missile and asteroid when they explode",
+      { assertFalse(missile.isActive) },
+      { assertFalse(asteroid.isActive) },
+    )
+  }
+
+  @Test
+  fun `it does not remove an active explosion`() {
+    spaceField.generateMissile()
+    val missile = spaceField.missiles.last()
+
+    spaceField.generateAsteroid()
+    val asteroid = spaceField.asteroids.last()
+
+    spaceField.generateExplosion(missile, asteroid)
+    val explosion = spaceField.explosions.last()
+
+    spaceField.trimExplosions()
+
+    assertNotEquals(-1, spaceField.explosions.indexOf(explosion))
+  }
+
+  @Test
+  fun `it can remove a deactivated explosion`() {
+    spaceField.generateMissile()
+    val missile = spaceField.missiles.last()
+
+    spaceField.generateAsteroid()
+    val asteroid = spaceField.asteroids.last()
+
+    spaceField.generateExplosion(missile, asteroid)
+    val explosion = spaceField.explosions.last()
+
+    explosion.isActive = false
+
+    spaceField.trimExplosions()
+
+    assertEquals(-1, spaceField.explosions.indexOf(explosion))
   }
 }

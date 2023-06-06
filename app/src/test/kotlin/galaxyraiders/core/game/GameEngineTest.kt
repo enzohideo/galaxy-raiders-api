@@ -204,6 +204,41 @@ class GameEngineTest {
   }
 
   @Test
+  fun `it generates an Explosion when a Missile hits an Asteroid`() {
+    hardGame.field.generateAsteroid()
+    val asteroid = hardGame.field.asteroids.last()
+
+    val ship = hardGame.field.ship
+    val shipDistanceToAsteroid = asteroid.center.x - ship.center.x
+    if (shipDistanceToAsteroid > 0) {
+      ship.boostRight()
+    } else {
+      ship.boostLeft()
+    }
+    val repetitionsToGetShipUnderAsteroid = Math.ceil(
+      shipDistanceToAsteroid / ship.velocity.dx
+    ).toInt()
+    repeat(repetitionsToGetShipUnderAsteroid) {
+      ship.move()
+    }
+
+    hardGame.field.generateMissile()
+    val missile = hardGame.field.missiles.last()
+    val missileDistanceToAsteroid = asteroid.center.y - missile.center.y
+    val repetitionsToGetMissileToHitAsteroid = Math.ceil(
+      missileDistanceToAsteroid / Math.abs(missile.velocity.dy)
+    ).toInt()
+    repeat(repetitionsToGetMissileToHitAsteroid) {
+      missile.move()
+    }
+
+    val numExplosions = hardGame.field.explosions.size
+    hardGame.generateExplosions()
+
+    assertEquals(numExplosions + 1, hardGame.field.explosions.size)
+  }
+
+  @Test
   fun `it can execute one iteration of the game loop`() {
     val numPlayerCommands = controllerSpy.playerCommands.size
     val numAsteroids = hardGame.field.asteroids.size

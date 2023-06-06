@@ -9,4 +9,9 @@ class Asteroid(
   radius: Double,
   mass: Double
 ) :
-  SpaceObject("Asteroid", '.', initialPosition, initialVelocity, radius, mass)
+  SpaceObject("Asteroid", '.', initialPosition, initialVelocity, radius, mass) {
+  fun explode(): Explosion {
+    this.isActive = false
+    return Explosion(this.center, this.radius)
+  }
+}

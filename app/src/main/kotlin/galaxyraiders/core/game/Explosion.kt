@@ -25,7 +25,6 @@ class Explosion(
 
   private fun hasEnded(): Boolean {
     val now = System.currentTimeMillis()
-    println("explosion: " + (now - this.triggerTime) + " " + this.duration + " trig: " + this.wasTriggered)
     return this.wasTriggered && (now - this.triggerTime) > this.duration
   }
 }

@@ -20,10 +20,7 @@ class Explosion(
     this.duration = duration
   }
 
-  override var isActive: Boolean = true
-    get() = field && !this.hasEnded()
-
-  private fun hasEnded(): Boolean {
+  fun hasEnded(): Boolean {
     val now = System.currentTimeMillis()
     return this.wasTriggered && (now - this.triggerTime) > this.duration
   }

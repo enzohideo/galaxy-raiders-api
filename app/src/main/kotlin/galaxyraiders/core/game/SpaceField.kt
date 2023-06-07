@@ -87,7 +87,7 @@ data class SpaceField(val width: Int, val height: Int, val generator: RandomGene
 
   fun trimExplosions() {
     this.explosions = this.explosions.filter {
-      it.isActive
+      it.isActive && !it.hasEnded()
     }
   }
 

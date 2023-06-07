@@ -56,12 +56,11 @@ class ExplosionTest {
   }
 
   @Test
-  fun `it deactivates itself after the explosion ends `() {
+  fun `it ends after the specified duration `() {
     val duration: Long = 500
     explosion.trigger(duration)
 
-    assertTrue(explosion.isActive)
     Thread.sleep(duration + 1)
-    assertFalse(explosion.isActive)
+    assertTrue(explosion.hasEnded())
   }
 }

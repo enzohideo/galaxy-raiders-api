@@ -8,20 +8,20 @@ class Explosion(
   radius: Double,
 ) :
   SpaceObject("Explosion", '+', initialPosition, Vector2D(0.0, 0.0), radius, 0.0) {
-  private var triggerTime: Long = 0
-  var duration: Long = 0
-    private set
+  private var startTime: Long = 0
+  private var duration: Long = 0
 
-  val wasTriggered: Boolean
-    get() = this.triggerTime > 0
-
-  fun trigger(duration: Long) {
-    this.triggerTime = System.currentTimeMillis()
+  fun start(duration: Long) {
+    this.startTime = System.currentTimeMillis()
     this.duration = duration
+  }
+
+  fun hasStarted(): Boolean {
+    return this.startTime > 0
   }
 
   fun hasEnded(): Boolean {
     val now = System.currentTimeMillis()
-    return this.wasTriggered && (now - this.triggerTime) > this.duration
+    return this.hasStarted() && (now - this.startTime) > this.duration
   }
 }

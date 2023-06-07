@@ -489,7 +489,7 @@ class SpaceFieldTest {
   }
 
   @Test
-  fun `it does not remove an active explosion`() {
+  fun `it does not remove an explosion that has not been started `() {
     spaceField.generateMissile()
     val missile = spaceField.missiles.last()
 
@@ -502,6 +502,29 @@ class SpaceFieldTest {
     spaceField.trimExplosions()
 
     assertNotEquals(-1, spaceField.explosions.indexOf(explosion))
+  }
+
+  @Test
+  fun `it does not remove an explosion that has been started and has not ended `() {
+    spaceField.generateMissile()
+    val missile = spaceField.missiles.last()
+
+    spaceField.generateAsteroid()
+    val asteroid = spaceField.asteroids.last()
+
+    spaceField.generateExplosion(missile, asteroid)
+    val explosion = spaceField.explosions.last()
+
+    val duration: Long = 1000
+    explosion.start(duration)
+
+    spaceField.trimExplosions()
+
+    assertAll(
+      "SpaceField should not remove an explosion that has not ended",
+      { assertFalse(explosion.hasEnded()) },
+      { assertNotEquals(-1, spaceField.explosions.indexOf(explosion)) }
+    )
   }
 
   @Test
@@ -520,5 +543,30 @@ class SpaceFieldTest {
     spaceField.trimExplosions()
 
     assertEquals(-1, spaceField.explosions.indexOf(explosion))
+  }
+
+  @Test
+  fun `it can remove an explosion that has already ended `() {
+    spaceField.generateMissile()
+    val missile = spaceField.missiles.last()
+
+    spaceField.generateAsteroid()
+    val asteroid = spaceField.asteroids.last()
+
+    spaceField.generateExplosion(missile, asteroid)
+    val explosion = spaceField.explosions.last()
+
+    val duration: Long = 500
+    explosion.start(duration)
+
+    Thread.sleep(duration + 1)
+
+    spaceField.trimExplosions()
+
+    assertAll(
+      "SpaceField should remove an explosion that has already ended",
+      { assertTrue(explosion.hasEnded()) },
+      { assertEquals(-1, spaceField.explosions.indexOf(explosion)) }
+    )
   }
 }

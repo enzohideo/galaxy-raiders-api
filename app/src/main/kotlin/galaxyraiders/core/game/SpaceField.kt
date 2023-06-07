@@ -174,7 +174,8 @@ data class SpaceField(val width: Int, val height: Int, val generator: RandomGene
 
   private fun createExplosion(missile: Missile, asteroid: Asteroid): Explosion {
     val explosion = missile.hit(asteroid)
-    explosion.trigger(SpaceFieldConfig.explosionDuration)
+    explosion.start(SpaceFieldConfig.explosionDuration)
+
     return explosion
   }
 }

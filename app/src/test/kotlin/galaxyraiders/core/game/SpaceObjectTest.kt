@@ -81,7 +81,7 @@ class SpaceObjectTest {
   }
 
   @Test
-  fun `it can verify if it is active `() {
+  fun `it starts active `() {
     assertTrue(so.isActive)
   }
 

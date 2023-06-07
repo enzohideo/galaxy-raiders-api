@@ -34,33 +34,29 @@ class ExplosionTest {
   }
 
   @Test
-  fun `it starts untriggered `() {
-    assertFalse(explosion.wasTriggered)
+  fun `it has not been started upon creation `() {
+    assertFalse(explosion.hasStarted())
   }
 
   @Test
-  fun `it starts active `() {
-    assertTrue(explosion.isActive)
+  fun `it has not ended upon creation `() {
+    assertFalse(explosion.hasEnded())
   }
 
   @Test
-  fun `it can be triggered with a specific duration time`() {
+  fun `it can be started with a specific duration `() {
     val duration: Long = 1000
-    explosion.trigger(duration)
+    explosion.start(duration)
 
-    assertAll(
-      "Explosion should trigger and set the specified duration",
-      { assertEquals(duration, explosion.duration) },
-      { assertTrue(explosion.wasTriggered) }
-    )
+    assertTrue(explosion.hasStarted())
   }
 
   @Test
   fun `it ends after the specified duration `() {
     val duration: Long = 500
-    explosion.trigger(duration)
-
+    explosion.start(duration)
     Thread.sleep(duration + 1)
+
     assertTrue(explosion.hasEnded())
   }
 }

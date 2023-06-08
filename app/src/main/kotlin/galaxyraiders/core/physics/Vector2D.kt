@@ -24,7 +24,11 @@ data class Vector2D(val dx: Double, val dy: Double) {
     get() = this.radiant * PI_RADIANS_IN_DEGREES / PI
 
   val unit: Vector2D
-    get() = this / this.magnitude
+    get() {
+      val magnitude = this.magnitude
+      if (magnitude == 0.0) return this
+      return this / magnitude
+    }
 
   val normal: Vector2D
     get() = Vector2D(dy, -dx).unit

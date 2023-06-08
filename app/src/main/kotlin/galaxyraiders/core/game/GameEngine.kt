@@ -58,8 +58,9 @@ class GameEngine(
   }
 
   fun processPlayerInput() {
-    this.controller.nextPlayerCommand()?.also {
-      when (it) {
+    while (true) {
+      val command: PlayerCommand? = this.controller.nextPlayerCommand()
+      when (command) {
         PlayerCommand.MOVE_SHIP_UP ->
           this.field.ship.boostUp()
         PlayerCommand.MOVE_SHIP_DOWN ->
@@ -72,6 +73,8 @@ class GameEngine(
           this.field.generateMissile()
         PlayerCommand.PAUSE_GAME ->
           this.playing = !this.playing
+        else ->
+          break
       }
     }
   }

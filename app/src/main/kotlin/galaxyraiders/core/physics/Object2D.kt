@@ -9,7 +9,7 @@ open class Object2D(
   var center: Point2D = initialPosition
     protected set
 
-  var velocity: Vector2D = initialVelocity
+  open var velocity: Vector2D = initialVelocity
     protected set
 
   fun move() {

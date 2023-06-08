@@ -29,7 +29,6 @@ class SpaceShipRouter : Router, Controller {
   }
 
   override fun nextPlayerCommand(): Controller.PlayerCommand? {
-    if (playerCommands.isEmpty()) return null
-    return playerCommands.remove()
+    return playerCommands.poll()
   }
 }

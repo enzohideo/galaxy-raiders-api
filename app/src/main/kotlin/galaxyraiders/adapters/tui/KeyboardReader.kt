@@ -35,7 +35,6 @@ class KeyboardReader : Controller {
   }
 
   override fun nextPlayerCommand(): PlayerCommand? {
-    if (playerCommands.isEmpty()) return null
-    return playerCommands.remove()
+    return playerCommands.poll()
   }
 }

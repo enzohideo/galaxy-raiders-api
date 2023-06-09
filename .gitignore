@@ -3,3 +3,7 @@
 
 # Ignore Gradle build output directory
 build
+
+# Ignore Scoreboard and Leaderboard files
+Scoreboard.json
+Leaderboard.json

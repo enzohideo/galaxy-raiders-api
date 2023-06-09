@@ -240,7 +240,6 @@ class GameEngineTest {
 
   @Test
   fun `it can execute one iteration of the game loop`() {
-    val numPlayerCommands = controllerSpy.playerCommands.size
     val numAsteroids = hardGame.field.asteroids.size
     val numRenders = visualizerSpy.numRenders
 
@@ -248,7 +247,7 @@ class GameEngineTest {
 
     assertAll(
       "GameEngine should process input, update and render",
-      { assertEquals(numPlayerCommands - 1, controllerSpy.playerCommands.size) },
+      { assertEquals(0, controllerSpy.playerCommands.size) },
       { assertEquals(numAsteroids + 1, hardGame.field.asteroids.size) },
       { assertEquals(numRenders + 1, visualizerSpy.numRenders) },
     )

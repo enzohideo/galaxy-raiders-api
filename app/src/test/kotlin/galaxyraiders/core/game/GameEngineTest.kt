@@ -320,7 +320,7 @@ class GameEngineTest {
     hardGame.updateScore()
 
     assertAll(
-      "GameEngine should submit the updated score to the scoreboard and leaderboard",
+      "GameEngine should not submit the score to the scoreboard and leaderboard",
       { assertEquals(numLeaderboardSubmissions, leaderboardSpy.numSubmissions) },
       { assertEquals(numScoreboardSubmissions, scoreboardSpy.numSubmissions) },
     )

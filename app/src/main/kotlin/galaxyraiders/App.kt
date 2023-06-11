@@ -2,6 +2,8 @@
 package galaxyraiders
 
 import galaxyraiders.adapters.BasicRandomGenerator
+import galaxyraiders.adapters.score.LeaderboardArchiver
+import galaxyraiders.adapters.score.ScoreboardArchiver
 import galaxyraiders.adapters.tui.TextUserInterface
 import galaxyraiders.adapters.web.WebUserInterface
 import galaxyraiders.core.game.GameEngine
@@ -27,8 +29,14 @@ fun main() {
 
   val (controller, visualizer) = ui.build()
 
+  val scoreboard = ScoreboardArchiver()
+  scoreboard.load()
+
+  val leaderboard = LeaderboardArchiver()
+  leaderboard.load()
+
   val gameEngine = GameEngine(
-    generator, controller, visualizer
+    generator, controller, visualizer, scoreboard, leaderboard
   )
 
   thread { gameEngine.execute() }

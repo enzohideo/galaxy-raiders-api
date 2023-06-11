@@ -1,7 +1,9 @@
 package galaxyraiders.core.game
 
 import galaxyraiders.Config
+import galaxyraiders.core.score.ScoreCalculator
 import galaxyraiders.ports.RandomGenerator
+import galaxyraiders.ports.ScoreArchiver
 import galaxyraiders.ports.ui.Controller
 import galaxyraiders.ports.ui.Controller.PlayerCommand
 import galaxyraiders.ports.ui.Visualizer
@@ -26,12 +28,17 @@ class GameEngine(
   val generator: RandomGenerator,
   val controller: Controller,
   val visualizer: Visualizer,
+  val scoreboard: ScoreArchiver,
+  val leaderboard: ScoreArchiver,
 ) {
   val field = SpaceField(
     width = GameEngineConfig.spaceFieldWidth,
     height = GameEngineConfig.spaceFieldHeight,
     generator = generator
   )
+
+  val scoreCalculator = ScoreCalculator()
+  var scoreHasChanged = false
 
   var playing = true
 
@@ -54,6 +61,7 @@ class GameEngine(
   fun tick() {
     this.processPlayerInput()
     this.updateSpaceObjects()
+    this.updateScore()
     this.renderSpaceField()
   }
 
@@ -93,10 +101,21 @@ class GameEngine(
       this.field.missiles.forEach { missile ->
         if (missile.impacts(asteroid)) {
           this.field.generateExplosion(missile, asteroid)
+          this.scoreCalculator.evaluate(asteroid)
+          this.scoreHasChanged = true
           return@nextAsteroid
         }
       }
     }
+  }
+
+  fun updateScore() {
+    if (!this.scoreHasChanged) return
+    this.scoreHasChanged = false
+
+    val score = this.scoreCalculator.generateScore()
+    this.leaderboard.submit(score)
+    this.scoreboard.submit(score)
   }
 
   fun handleCollisions() {

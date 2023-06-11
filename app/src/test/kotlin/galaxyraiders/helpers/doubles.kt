@@ -1,7 +1,9 @@
 package galaxyraiders.helpers
 
 import galaxyraiders.core.game.SpaceField
+import galaxyraiders.core.score.Score
 import galaxyraiders.ports.RandomGenerator
+import galaxyraiders.ports.ScoreArchiver
 import galaxyraiders.ports.ui.Controller
 import galaxyraiders.ports.ui.Controller.PlayerCommand
 import galaxyraiders.ports.ui.Visualizer
@@ -85,5 +87,20 @@ class ControllerSpy : Controller {
   override fun nextPlayerCommand(): PlayerCommand? {
     if (playerCommands.isEmpty()) return null
     return playerCommands.remove()
+  }
+}
+
+class ScoreArchiverSpy : ScoreArchiver {
+  var numSubmissions = 0
+    private set
+  var numLoads = 0
+    private set
+
+  override fun load() {
+    this.numLoads++
+  }
+
+  override fun submit(score: Score) {
+    this.numSubmissions++
   }
 }

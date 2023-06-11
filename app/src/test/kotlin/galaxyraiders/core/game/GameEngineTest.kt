@@ -4,11 +4,13 @@ import galaxyraiders.helpers.AverageValueGeneratorStub
 import galaxyraiders.helpers.ControllerSpy
 import galaxyraiders.helpers.MaxValueGeneratorStub
 import galaxyraiders.helpers.MinValueGeneratorStub
+import galaxyraiders.helpers.ScoreArchiverSpy
 import galaxyraiders.helpers.VisualizerSpy
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNotEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
@@ -20,23 +22,31 @@ class GameEngineTest {
   private val minGenerator = MinValueGeneratorStub()
   private val controllerSpy = ControllerSpy()
   private val visualizerSpy = VisualizerSpy()
+  private val scoreboardSpy = ScoreArchiverSpy()
+  private val leaderboardSpy = ScoreArchiverSpy()
 
   private val normalGame = GameEngine(
     generator = avgGenerator,
     controller = controllerSpy,
     visualizer = visualizerSpy,
+    scoreboard = scoreboardSpy,
+    leaderboard = leaderboardSpy,
   )
 
   private val easyGame = GameEngine(
     generator = maxGenerator,
     controller = controllerSpy,
     visualizer = visualizerSpy,
+    scoreboard = scoreboardSpy,
+    leaderboard = leaderboardSpy,
   )
 
   private val hardGame = GameEngine(
     generator = minGenerator,
     controller = controllerSpy,
     visualizer = visualizerSpy,
+    scoreboard = scoreboardSpy,
+    leaderboard = leaderboardSpy,
   )
 
   @Test
@@ -47,6 +57,8 @@ class GameEngineTest {
       { assertEquals(avgGenerator, normalGame.generator,) },
       { assertEquals(controllerSpy, normalGame.controller) },
       { assertEquals(visualizerSpy, normalGame.visualizer) },
+      { assertEquals(scoreboardSpy, normalGame.scoreboard) },
+      { assertEquals(leaderboardSpy, normalGame.leaderboard) },
     )
   }
 
@@ -204,7 +216,7 @@ class GameEngineTest {
   }
 
   @Test
-  fun `it generates an Explosion when a Missile hits an Asteroid`() {
+  fun `it generates an Explosion and changes the score when a Missile hits an Asteroid`() {
     hardGame.field.generateAsteroid()
     val asteroid = hardGame.field.asteroids.last()
 
@@ -233,9 +245,16 @@ class GameEngineTest {
     }
 
     val numExplosions = hardGame.field.explosions.size
+    val numPoints = hardGame.scoreCalculator.points
+
     hardGame.generateExplosions()
 
-    assertEquals(numExplosions + 1, hardGame.field.explosions.size)
+    assertAll(
+      "GameEngine should generate an explosion and update the player's score",
+      { assertEquals(numExplosions + 1, hardGame.field.explosions.size) },
+      { assertTrue(hardGame.scoreHasChanged) },
+      { assertNotEquals(numPoints, hardGame.scoreCalculator.points) },
+    )
   }
 
   @Test
@@ -269,6 +288,41 @@ class GameEngineTest {
       { assertEquals(0, controllerSpy.playerCommands.size) },
       { assertEquals(expectedNumRenders, visualizerSpy.numRenders) },
       { assertTrue(hardGame.field.asteroids.size <= numPlayerCommands - 1) },
+    )
+  }
+
+  @Test
+  fun `it starts with no changes to the score`() {
+    assertFalse(hardGame.scoreHasChanged)
+  }
+
+  @Test
+  fun `it can update the scoreboard and leaderboard when the score has changed`() {
+    val numLeaderboardSubmissions = leaderboardSpy.numSubmissions
+    val numScoreboardSubmissions = scoreboardSpy.numSubmissions
+
+    hardGame.scoreHasChanged = true
+    hardGame.updateScore()
+
+    assertAll(
+      "GameEngine should submit the updated score to the scoreboard and leaderboard",
+      { assertEquals(numLeaderboardSubmissions + 1, leaderboardSpy.numSubmissions) },
+      { assertEquals(numScoreboardSubmissions + 1, scoreboardSpy.numSubmissions) },
+    )
+  }
+
+  @Test
+  fun `it does not update the scoreboard and leaderboard when the score has not changed`() {
+    val numLeaderboardSubmissions = leaderboardSpy.numSubmissions
+    val numScoreboardSubmissions = scoreboardSpy.numSubmissions
+
+    hardGame.scoreHasChanged = false
+    hardGame.updateScore()
+
+    assertAll(
+      "GameEngine should submit the updated score to the scoreboard and leaderboard",
+      { assertEquals(numLeaderboardSubmissions, leaderboardSpy.numSubmissions) },
+      { assertEquals(numScoreboardSubmissions, scoreboardSpy.numSubmissions) },
     )
   }
 }

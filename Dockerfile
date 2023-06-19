@@ -58,5 +58,7 @@ ARG APP_DIR=/home/gradle/galaxy-raiders
 COPY --from=builder ${APP_DIR}/app/build/libs/galaxy-raiders.jar \
                     /bin/runner/galaxy-raiders.jar
 
+WORKDIR /bin/runner
+
 # Run uber JAR to start application
 CMD ["java", "-jar", "galaxy-raiders.jar"]

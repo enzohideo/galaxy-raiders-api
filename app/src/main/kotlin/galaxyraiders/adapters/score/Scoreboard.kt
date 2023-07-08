@@ -9,37 +9,37 @@ import java.io.File
 import java.io.IOException
 
 object ScoreboardConfig {
-  private val config = Config(prefix = "GR__ADAPTERS__SCOREBOARD_ARCHIVER__")
+  private val config = Config(prefix = "GR__ADAPTERS__SCOREBOARD__")
 
   val path = config.get<String>("PATH")
 }
 
-open class ScoreboardArchiver : ScoreArchiver {
-  protected var scoreboard: List<Score> = emptyList()
+open class Scoreboard : ScoreArchiver {
+  protected var scores: List<Score> = emptyList()
   protected open val path: String = ScoreboardConfig.path
 
   override fun load() {
     try {
       val mapper = jacksonObjectMapper()
-      this.scoreboard = mapper.readValue<List<Score>>(
+      this.scores = mapper.readValue<List<Score>>(
         File(this.path)
       )
     } catch (_: IOException) {
-      this.scoreboard = emptyList()
+      this.scores = emptyList()
     }
   }
 
-  protected fun save(scoreboard: List<Score>) {
+  protected fun save(scores: List<Score>) {
     try {
       val mapper = jacksonObjectMapper().writerWithDefaultPrettyPrinter()
-      mapper.writeValue(File(this.path), scoreboard)
+      mapper.writeValue(File(this.path), scores)
     } catch (_: IOException) {
       println("Failed to submit score.")
     }
   }
 
   override fun submit(score: Score) {
-    val scoreboard = this.scoreboard + score
+    val scoreboard = this.scores + score
     this.save(scoreboard)
   }
 }

@@ -4,17 +4,17 @@ import galaxyraiders.Config
 import galaxyraiders.core.score.Score
 
 object LeaderboardConfig {
-  private val config = Config(prefix = "GR__ADAPTERS__LEADERBOARD_ARCHIVER__")
+  private val config = Config(prefix = "GR__ADAPTERS__LEADERBOARD__")
 
   val path = config.get<String>("PATH")
   val size = config.get<Int>("SIZE")
 }
 
-class LeaderboardArchiver : ScoreboardArchiver() {
+class Leaderboard : Scoreboard() {
   protected override val path: String = LeaderboardConfig.path
 
   override fun submit(score: Score) {
-    var leaderboard = (this.scoreboard + score)
+    var leaderboard = this.scores + score
     leaderboard = leaderboard.sortedByDescending { it.points }
     leaderboard = leaderboard.take(LeaderboardConfig.size)
 

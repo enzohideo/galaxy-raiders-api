@@ -11,13 +11,13 @@ object LeaderboardConfig {
 }
 
 class Leaderboard : Scoreboard() {
-  protected override val path: String = LeaderboardConfig.path
+  override val path = LeaderboardConfig.path
 
   override fun submit(score: Score) {
     var leaderboard = this.scores + score
     leaderboard = leaderboard.sortedByDescending { it.points }
     leaderboard = leaderboard.take(LeaderboardConfig.size)
 
-    this.save(leaderboard)
+    this.write(leaderboard)
   }
 }

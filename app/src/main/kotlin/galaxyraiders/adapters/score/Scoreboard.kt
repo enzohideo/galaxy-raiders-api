@@ -10,16 +10,16 @@ object ScoreboardConfig {
   val path = config.get<String>("PATH")
 }
 
-open class Scoreboard : FileManager(), ScoreArchiver {
-  override val path = ScoreboardConfig.path
+open class Scoreboard : ScoreArchiver {
+  open val fileManager = FileManager(ScoreboardConfig.path);
   var scores: List<Score> = emptyList()
 
   override fun load() {
-    this.scores = this.read()
+    this.scores = this.fileManager.read()
   }
 
   override fun submit(score: Score) {
     val scoreboard = this.scores + score
-    this.write(scoreboard)
+    this.fileManager.write(scoreboard)
   }
 }

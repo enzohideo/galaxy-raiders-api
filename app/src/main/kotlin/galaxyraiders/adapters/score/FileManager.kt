@@ -6,9 +6,9 @@ import galaxyraiders.core.score.Score
 import java.io.File
 import java.io.IOException
 
-abstract class FileManager {
-  abstract val path: String
-
+class FileManager(
+    val path: String
+) {
   fun read(): List<Score> {
     try {
       val mapper = jacksonObjectMapper()
